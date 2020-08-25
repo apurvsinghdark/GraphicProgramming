@@ -3,6 +3,9 @@
 #include<iostream>
 #include<glew.h>
 #include<glfw3.h>
+#include<fstream>
+#include<string>
+#include<vector>
 
 //Math Includes Library
 #include<glm.hpp>
