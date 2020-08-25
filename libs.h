@@ -8,3 +8,6 @@
 #include<glm.hpp>
 #include<gtc/matrix_transform.hpp>
 #include<gtc/type_ptr.hpp>
+
+//image libs
+#include<SOIL2.h>
