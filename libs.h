@@ -14,3 +14,11 @@
 
 //image libs
 #include<SOIL2.h>
+
+//vertex points
+struct Vertex
+{
+	glm::vec3 position;
+	glm::vec3 color;
+	glm::vec2 texcoord;
+};

@@ -1,8 +1,32 @@
 #include"libs.h"
 
+Vertex vertices[] =
+{
+	///position						//color							//texcoord
+	glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f,0.0f,0.0f),		glm::vec2(0.0f,1.0f),
+	glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(0.0f,1.0f,0.0f),		glm::vec2(0.0f,0.0f),
+	glm::vec3( 0.5f,-0.5f,0.0f),	glm::vec3(0.0f,0.0f,1.0f),		glm::vec2(1.0f,0.0f),
+	
+	glm::vec3( 0.5f,-0.5f,0.0f),	glm::vec3(0.0f,0.0f,1.0f),		glm::vec2(1.0f,0.0f),
+	glm::vec3( 0.5f,0.5f,0.0f),		glm::vec3(0.0f,1.0f,0.0f),		glm::vec2(1.0f,0.0f),
+	glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f,0.0f,0.0f),		glm::vec2(0.0f,1.0f),
+};
+
+unsigned noOfVertices = sizeof(vertices) / sizeof(Vertex);
+
+GLuint indicies[] =
+{
+	0, 1, 2,
+	3, 4, 5,
+};
+
+unsigned noOfIndicies = sizeof(indicies) / sizeof(GLuint);
+
 void FrameBufferSizeCallBack(GLFWwindow*window,int frameBufferWidth,int frameBufferHeight); //Declaration FrameBUfferFunction
 
 bool loadShader(GLuint& program);
+
+void Input(GLFWwindow* window);
 
 int main()
 {
@@ -35,6 +59,22 @@ int main()
 		glfwTerminate();
 	}
 
+	//OpenGL (OPTIMIZATION)
+	glEnable(GL_DEPTH);
+	
+	/// <summary>
+	/// CULLING BAcK FACE What we are not watching
+	/// </summary>
+	/// <returns></returns>
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//set the polygon into Fill or Skeleton(GL_LINES)
+	
 	//vertex & fragment Shaders
 	GLuint program;
 	if (!loadShader(program))
@@ -42,10 +82,45 @@ int main()
 		glfwTerminate();
 	}
 
+	//init VAO(Vertex Array) and Bind it
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	//init VBO and bind
+	GLuint VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	//init EBO and bind
+	GLuint EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+
+	// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
+	///FOR position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(0);
+
+	/// For Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(1);
+
+	/// For texture(Texcoord)
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
+	glEnableVertexAttribArray(2);
+
+	//Bind Array
+	glBindVertexArray(VAO);
+
+	//UpdateLoop
 	while (!glfwWindowShouldClose(window))
 	{
 		//UPDATE INPUTS
-		
+		Input(window);
+
 		//CALL INPUT EVENTS
 		glfwPollEvents();
 
@@ -54,7 +129,15 @@ int main()
 		//CLEAR
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		
+		//PROGRAM
+		glUseProgram(program);
+
+		//Arrays BINDING
+		glBindVertexArray(VAO);
+
 		//DRAW
+		glDrawElements(GL_TRIANGLES, noOfIndicies, GL_UNSIGNED_INT, 0);
 
 		//END OF DRAW
 		glfwSwapBuffers(window);
@@ -185,4 +268,12 @@ bool loadShader(GLuint& program)
 	glDeleteShader(FRAGMENTSHADER);
 
 	return loadSuccess;
+}
+
+void Input(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
 }
