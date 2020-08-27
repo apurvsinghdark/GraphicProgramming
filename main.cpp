@@ -113,20 +113,48 @@ int main()
 	//Bind Array
 	glBindVertexArray(VAO);
 
-	//Texture INIT
+	//Texture
 	int imageHeight = 0;
 	int imageWidth = 0;
 
+	//Texture0 INIT
 	unsigned char* image = SOIL_load_image("Image/mars.jpg", &imageWidth, &imageHeight, NULL, SOIL_LOAD_RGBA);
 
 	GLuint texture0;
-	glGenTextures(1, &texture0);
-	glBindTexture(GL_TEXTURE_2D, texture0);
+	glGenTextures(1, &texture0); //Genrating Texture At 0 point
+	glBindTexture(GL_TEXTURE_2D, texture0); //Bind Texture properties with 0 point
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //Scaling at x-axis
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //Scaling at y-axis
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Scaling at Z-axis (Zoom-In) anti-alising
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Scaling at Z-axis (Zoom-Out) aniti-alising
+
+	if (image)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image); //getting image data
+		glGenerateMipmap(GL_TEXTURE_2D); //scaling with mipmap
+	}
+	else
+	{
+		std::cout << "ENABLE_TO_LOAD_TEXTURES" << std::endl;
+	}
+
+	//Unloading
+	glActiveTexture(0); //deactivating
+	glBindTexture(GL_TEXTURE_2D,0); //unibinding
+	SOIL_free_image_data(image);
+
+	//Texture1 INIT
+	image = SOIL_load_image("Image/img_test.png", &imageWidth, &imageHeight, NULL, SOIL_LOAD_RGBA);
+
+	GLuint texture1;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	if (image)
 	{
@@ -135,11 +163,12 @@ int main()
 	}
 	else
 	{
-		std::cout << "ENABLE_TO_LOAD_TEXTURES" << std::endl;
+		std::cout << "TEXTTURE_NOT_LOADED_SUCCESSFULLY" << std::endl;
 	}
 
 	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(image);
 
 	//UpdateLoop
 	while (!glfwWindowShouldClose(window))
@@ -161,14 +190,17 @@ int main()
 		
 		//Arrays BINDING
 		glBindVertexArray(VAO);
-		
-
+				
 		//Uniformtexture Update
 		glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
 		//Activate TEXTURE
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture0);
+		glActiveTexture(GL_TEXTURE0); // activating textures at O coordinate in GPU
+		glBindTexture(GL_TEXTURE_2D, texture0); //binding
+		
+		glActiveTexture(GL_TEXTURE1); // activating textures at 1 coordinate in GPU
+		glBindTexture(GL_TEXTURE_2D, texture1); //binding
 		
 		//DRAW
 		glDrawElements(GL_TRIANGLES, noOfIndicies, GL_UNSIGNED_INT, 0);
@@ -190,7 +222,7 @@ int main()
 
 	//Delete Program
 	glDeleteProgram(program);
-	//GLFWwindow* window = glfwCreateWindow(800, 600, GLFWwindow * window, nullptr);
+
 	return 0;
 }
 
