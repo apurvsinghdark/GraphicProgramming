@@ -6,27 +6,25 @@ Vertex vertices[] =
 	glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f,0.0f,0.0f),		glm::vec2(0.0f,1.0f),
 	glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(0.0f,1.0f,0.0f),		glm::vec2(0.0f,0.0f),
 	glm::vec3( 0.5f,-0.5f,0.0f),	glm::vec3(0.0f,0.0f,1.0f),		glm::vec2(1.0f,0.0f),
+	glm::vec3( 0.5f, 0.5f,0.0f),	glm::vec3(1.0f,1.0f,0.0f),		glm::vec2(1.0f,1.0f),
 	
-	glm::vec3( 0.5f,-0.5f,0.0f),	glm::vec3(0.0f,0.0f,1.0f),		glm::vec2(1.0f,0.0f),
-	glm::vec3( 0.5f,0.5f,0.0f),		glm::vec3(0.0f,1.0f,0.0f),		glm::vec2(1.0f,0.0f),
-	glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f,0.0f,0.0f),		glm::vec2(0.0f,1.0f),
 };
 
 unsigned noOfVertices = sizeof(vertices) / sizeof(Vertex);
 
 GLuint indicies[] =
 {
-	0, 1, 2,
-	3, 4, 5,
+	0, 1, 2, //Triangle 1
+	2, 3, 0, //Triangle 2
 };
 
 unsigned noOfIndicies = sizeof(indicies) / sizeof(GLuint);
 
 void FrameBufferSizeCallBack(GLFWwindow*window,int frameBufferWidth,int frameBufferHeight); //Declaration FrameBUfferFunction
 
-bool loadShader(GLuint& program);
+bool loadShader(GLuint& program); //vetex and shader loading
 
-void Input(GLFWwindow* window);
+void Input(GLFWwindow* window); //Input declaration
 
 int main()
 {
@@ -37,8 +35,8 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	//Create Window
-	const int WINDOW_WIDTH = 640;
-	const int WINDOW_HEIGHT = 800;
+	const int WINDOW_WIDTH = 800;
+	const int WINDOW_HEIGHT = 640;
 	
 	GLFWwindow* window;
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "GP_UP", nullptr, nullptr);
@@ -115,6 +113,34 @@ int main()
 	//Bind Array
 	glBindVertexArray(VAO);
 
+	//Texture INIT
+	int imageHeight = 0;
+	int imageWidth = 0;
+
+	unsigned char* image = SOIL_load_image("Image/mars.jpg", &imageWidth, &imageHeight, NULL, SOIL_LOAD_RGBA);
+
+	GLuint texture0;
+	glGenTextures(1, &texture0);
+	glBindTexture(GL_TEXTURE_2D, texture0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_LINEAR_MIPMAP_LINEAR);
+
+	if (image)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ENABLE_TO_LOAD_TEXTURES" << std::endl;
+	}
+
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+
 	//UpdateLoop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -127,21 +153,35 @@ int main()
 		//UPDATE
 
 		//CLEAR
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		
 		//PROGRAM
 		glUseProgram(program);
-
+		
 		//Arrays BINDING
 		glBindVertexArray(VAO);
+		
 
+		//Uniformtexture Update
+		glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+
+		//Activate TEXTURE
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture0);
+		
 		//DRAW
 		glDrawElements(GL_TRIANGLES, noOfIndicies, GL_UNSIGNED_INT, 0);
-
+		
 		//END OF DRAW
 		glfwSwapBuffers(window);
 		glFlush();
+
+		//Unbinding
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+		glActiveTexture(0);
 	}
 
 	//FINAL TERMINATE
