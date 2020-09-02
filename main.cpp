@@ -206,9 +206,8 @@ int main()
 	
 	glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
-	
 	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
-
+	
 	glUseProgram(0);
 	//UpdateLoop
 	while (!glfwWindowShouldClose(window))
@@ -236,10 +235,10 @@ int main()
 		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
 		//Uniform Location Of matrix form vertex.glsl
-		glm::mat4 ModelMatrix(1.0f);
+		//glm::mat4 ModelMatrix(1.0f);
 		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
 		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(60.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
 
