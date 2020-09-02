@@ -37,10 +37,13 @@ int main()
 	//Create Window
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 640;
-	
+	int frameBufferWidth = 0;
+	int frameBufferHeight = 0;
+
 	GLFWwindow* window;
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "GP_UP", nullptr, nullptr);
 
+	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallBack); //Give CallBack Of recent activity of Window Resizing (Calling)
 	
 	glfwMakeContextCurrent(window);
@@ -172,15 +175,39 @@ int main()
 
 	//ModelLoading
 	glm::mat4 ModelMatrix(1.0f);
-	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f));
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
 
+	glm::vec3 camPos(0.0f, 0.0f, 1.0f);
+	glm::vec3 worldUp (0.0f, 1.0f, 0.0f);
+	glm::vec3 camFront(0.0f, 0.0f, -1.0f);
+
+	glm::mat4 ViewMatrix(1.0f);
+	ViewMatrix = glm::lookAt(camPos, camPos + camFront, worldUp);
+
+	float fov = 90.0f;
+	float nearPlane = 0.1f;
+	float farPlane = 1000.0f;
+
+	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+
+	glm::mat4 ProjectionMatrix(1.0f);
+	ProjectionMatrix = glm::perspective(
+		glm::radians(fov),
+		static_cast<float>(frameBufferWidth) / frameBufferHeight,
+		nearPlane,
+		farPlane
+	);
+
 	glUseProgram(program);
 	
 	glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
+	
+	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 
 	glUseProgram(0);
 	//UpdateLoop
@@ -209,7 +236,26 @@ int main()
 		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
 		//Uniform Location Of matrix form vertex.glsl
+		glm::mat4 ModelMatrix(1.0f);
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(60.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
+
 		glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+		
+		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+		//glm::mat4 ProjectionMatrix(1.0f);
+		ProjectionMatrix = glm::perspective(
+			glm::radians(fov),
+			static_cast<float>(frameBufferWidth) / frameBufferHeight,
+			nearPlane,
+			farPlane
+		);
+
+		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+		glUniformMatrix4fv(glGetUniformLocation(program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 		
 		//Activate TEXTURE
 		glActiveTexture(GL_TEXTURE0); // activating textures at O coordinate in GPU
@@ -244,7 +290,6 @@ int main()
 
 void FrameBufferSizeCallBack(GLFWwindow* window, int frameBufferWidth, int frameBufferHeight) //Defination FrameBUfferFunction
 {
-	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
 	glViewport(0, 0, frameBufferWidth, frameBufferHeight);
 }
 
