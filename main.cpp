@@ -170,6 +170,19 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	SOIL_free_image_data(image);
 
+	//ModelLoading
+	glm::mat4 ModelMatrix(1.0f);
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
+
+	glUseProgram(program);
+	
+	glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+
+	glUseProgram(0);
 	//UpdateLoop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -195,6 +208,9 @@ int main()
 		glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
+		//Uniform Location Of matrix form vertex.glsl
+		glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+		
 		//Activate TEXTURE
 		glActiveTexture(GL_TEXTURE0); // activating textures at O coordinate in GPU
 		glBindTexture(GL_TEXTURE_2D, texture0); //binding
@@ -204,7 +220,7 @@ int main()
 		
 		//DRAW
 		glDrawElements(GL_TRIANGLES, noOfIndicies, GL_UNSIGNED_INT, 0);
-		
+
 		//END OF DRAW
 		glfwSwapBuffers(window);
 		glFlush();
