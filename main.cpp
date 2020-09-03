@@ -26,6 +26,8 @@ bool loadShader(GLuint& program); //vetex and shader loading
 
 void Input(GLFWwindow* window); //Input declaration
 
+void Input(GLFWwindow* window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale);
+
 int main()
 {
 	// GLFW INITIALIZATION
@@ -82,7 +84,8 @@ int main()
 	{
 		glfwTerminate();
 	}
-
+	
+	#pragma region BUFFERREADING
 	//init VAO(Vertex Array) and Bind it
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -115,7 +118,9 @@ int main()
 
 	//Bind Array
 	glBindVertexArray(VAO);
+	#pragma endregion
 
+	#pragma region TEXTURE
 	//Texture
 	int imageHeight = 0;
 	int imageWidth = 0;
@@ -173,13 +178,21 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	SOIL_free_image_data(image);
 
+	#pragma endregion
+
+	#pragma region MODELLOADING
 	//ModelLoading
+	glm::vec3 position(0.0f);
+	glm::vec3 rotation(0.0f);
+	glm::vec3 scale(1.0f);
+
+
 	glm::mat4 ModelMatrix(1.0f);
-	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
+	ModelMatrix = glm::translate(ModelMatrix, position);
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelMatrix = glm::scale(ModelMatrix, scale);
 
 	glm::vec3 camPos(0.0f, 0.0f, 1.0f);
 	glm::vec3 worldUp (0.0f, 1.0f, 0.0f);
@@ -209,6 +222,8 @@ int main()
 	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 	
 	glUseProgram(0);
+	#pragma endregion
+
 	//UpdateLoop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -219,7 +234,7 @@ int main()
 		glfwPollEvents();
 
 		//UPDATE
-
+		Input(window, position, rotation, scale);
 		//CLEAR
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -235,12 +250,14 @@ int main()
 		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
 		//Uniform Location Of matrix form vertex.glsl
-		//glm::mat4 ModelMatrix(1.0f);
-		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
+		//rotation.x += 1.0f;
+
+		glm::mat4 ModelMatrix(1.0f);
+		ModelMatrix = glm::translate(ModelMatrix, position);
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		ModelMatrix = glm::scale(ModelMatrix, scale);
 
 		glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
 		
@@ -407,5 +424,41 @@ void Input(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+}
+
+void Input(GLFWwindow* window, glm::vec3 &position,glm::vec3 &rotation, glm::vec3 &scale)
+{
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		position.z += 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		position.z -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		position.x += 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		position.x -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		rotation.y -= 1.0f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		rotation.y += 1.0f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	{
+		scale += 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		scale -= 0.01f;
 	}
 }
