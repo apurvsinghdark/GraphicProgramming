@@ -2,12 +2,12 @@
 
 Vertex vertices[] =
 {
-	///position						//color							//texcoord
-	glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f,0.0f,0.0f),		glm::vec2(0.0f,1.0f),
-	glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(0.0f,1.0f,0.0f),		glm::vec2(0.0f,0.0f),
-	glm::vec3( 0.5f,-0.5f,0.0f),	glm::vec3(0.0f,0.0f,1.0f),		glm::vec2(1.0f,0.0f),
-	glm::vec3( 0.5f, 0.5f,0.0f),	glm::vec3(1.0f,1.0f,0.0f),		glm::vec2(1.0f,1.0f),
-	
+	///position						//color							//texcoord					//Normal
+	glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,1.0f),		glm::vec3(0.0f,0.0f,-1.0f),
+	glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,0.0f),		glm::vec3(0.0f,0.0f,-1.0f),
+	glm::vec3(0.5f,-0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,0.0f),		glm::vec3(0.0f,0.0f,-1.0f),
+	glm::vec3(0.5f, 0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,1.0f),		glm::vec3(0.0f,0.0f,-1.0f),
+																	
 };
 
 unsigned noOfVertices = sizeof(vertices) / sizeof(Vertex);
@@ -115,6 +115,10 @@ int main()
 	/// For texture(Texcoord)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
 	glEnableVertexAttribArray(2);
+	
+	//Normal
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	glEnableVertexAttribArray(3);
 
 	//Bind Array
 	glBindVertexArray(VAO);
@@ -215,11 +219,15 @@ int main()
 		farPlane
 	);
 
+	glm::vec3 lightPos0(2.0f, 0.0f, 0.5f);
+
 	glUseProgram(program);
 	
 	glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+
+	glUniform3fv(glGetUniformLocation(program, "lightPos0"), 1, glm::value_ptr(lightPos0));
 	
 	glUseProgram(0);
 	#pragma endregion
@@ -250,7 +258,7 @@ int main()
 		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
 
 		//Uniform Location Of matrix form vertex.glsl
-		//rotation.x += 1.0f;
+		//rotation.y += 1.0f;
 
 		glm::mat4 ModelMatrix(1.0f);
 		ModelMatrix = glm::translate(ModelMatrix, position);
