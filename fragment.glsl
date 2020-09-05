@@ -15,7 +15,7 @@ uniform vec3 lightPos0;
 void main()
 { 
 	//Ambient Light
-	vec3 ambientLight = vec3(0.1f, 0.1f, 0.1f);
+	vec3 ambientLight = vec3(0.3f, 0.3f, 0.3f);
 
 	//Diffuse light
 	vec3 normalDir = normalize(vs_normal);
@@ -25,5 +25,5 @@ void main()
 	vec3 diffuseLight = diffColor * diffDir;
 
 	//fs_color = texture(texture0, vs_texcoord) * texture(texture1, vs_texcoord) * vec4(vs_color, 1.0f);;
-	fs_color = texture(texture1, vs_texcoord) * vec4(vs_color, 1.0f) * vec4(ambientLight, 1.0f) + vec4(diffuseLight, 1.0f);
+	fs_color = texture(texture1, vs_texcoord) * vec4(vs_color, 1.0f) * (vec4(ambientLight, 1.0f) + vec4(diffuseLight, 1.0f));
 }

@@ -219,7 +219,7 @@ int main()
 		farPlane
 	);
 
-	glm::vec3 lightPos0(2.0f, 0.0f, 0.5f);
+	glm::vec3 lightPos0(1.2f, 1.0f, -1.0f);
 
 	glUseProgram(program);
 	
