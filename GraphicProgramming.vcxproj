@@ -148,7 +148,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="libs.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />

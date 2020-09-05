@@ -34,6 +34,6 @@ void main()
 	vec3 specularLight = vec3(1.0f, 1.0f, 1.0f) * specularConst;
 
 	//fs_color = texture(texture0, vs_texcoord) * texture(texture1, vs_texcoord) * vec4(vs_color, 1.0f);;
-	fs_color = texture(texture1, vs_texcoord) * vec4(vs_color, 1.0f) 
+	fs_color = texture(texture0, vs_texcoord) * vec4(vs_color, 1.0f) 
 		* (vec4(ambientLight, 1.0f) + vec4(diffuseLight, 1.0f) + vec4(specularLight, 1.0f));
 }
