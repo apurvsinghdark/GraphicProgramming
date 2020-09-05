@@ -70,17 +70,23 @@ void Shader::Unuse()
 
 void Shader::SetVec2(const std::string& name, GLint count)
 {
+	Use();
 	glUniform1i(glGetUniformLocation(this->ID, name.c_str()), count);
+	Unuse();
 }
 
 void Shader::SetVec3(const std::string& name, glm::vec3 vector)
 {
+	Use();
 	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vector));
+	Unuse();
 }
 
 void Shader::SetMat4(const std::string& name, glm::mat4 matrix)
 {
+	Use();
 	glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+	Unuse();
 }
 
 std::string Shader::LoadShaderSource(const char* fileName)

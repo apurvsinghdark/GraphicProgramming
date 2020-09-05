@@ -231,6 +231,9 @@ int main()
 	//UpdateLoop
 	while (!glfwWindowShouldClose(window))
 	{
+		//PROGRAM
+		core_program.Use();
+
 		//UPDATE INPUTS
 		Input(window);
 
@@ -262,7 +265,7 @@ int main()
 
 		core_program.SetMat4("ModelMatrix", ModelMatrix);
 		
-		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+		//glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
 		//glm::mat4 ProjectionMatrix(1.0f);
 		ProjectionMatrix = glm::perspective(
 			glm::radians(fov),
@@ -275,8 +278,7 @@ int main()
 		
 		core_program.SetMat4("ProjectionMatrix", ProjectionMatrix);
 		
-		//PROGRAM
-		core_program.Use();
+		core_program.Use();//re-Init for becoz of SetMat
 		
 		//Activate TEXTURE
 		glActiveTexture(GL_TEXTURE0); // activating textures at O coordinate in GPU
