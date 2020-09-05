@@ -219,7 +219,7 @@ int main()
 		farPlane
 	);
 
-	glm::vec3 lightPos0(1.2f, 1.0f, -1.0f);
+	glm::vec3 lightPos0(0.0f, 0.0f, 2.0f);
 
 	glUseProgram(program);
 	
@@ -228,6 +228,7 @@ int main()
 	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 
 	glUniform3fv(glGetUniformLocation(program, "lightPos0"), 1, glm::value_ptr(lightPos0));
+	glUniform3fv(glGetUniformLocation(program, "camPos"), 1, glm::value_ptr(camPos));
 	
 	glUseProgram(0);
 	#pragma endregion
