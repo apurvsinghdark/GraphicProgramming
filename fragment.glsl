@@ -28,7 +28,7 @@ vec3 AmbidentLight(Material material) { return material.ambident; }
 
 vec3 DiffuseLight(Material material, vec3 vs_position, vec3 vs_normal, vec3 lightPos0)
 {
-	vec3 diffLightDir = normalize(vs_position - lightPos0);
+	vec3 diffLightDir = normalize(lightPos0 - vs_position);
 	float diffConst = clamp(dot(diffLightDir, vs_normal), 0, 1);
 	vec3 diffuseLight = material.diffuse * diffConst;
 	
@@ -37,9 +37,9 @@ vec3 DiffuseLight(Material material, vec3 vs_position, vec3 vs_normal, vec3 ligh
 
 vec3 SpecularLight(Material material, vec3 vs_position, vec3 vs_normal, vec3 lightPos0, vec3 camPos)
 {
-	vec3 specLightDir = normalize(lightPos0 - vs_position);
+	vec3 specLightDir = normalize(vs_position - lightPos0);
 	vec3 reflectionSrc = normalize(reflect(specLightDir,vs_normal)); // Light Coming From Source
-	vec3 reflectOnEye = normalize(vs_position - camPos); // reflection on eye
+	vec3 reflectOnEye = normalize(camPos - vs_position); // reflection on eye
 	float specularConst = pow(max(dot(reflectOnEye, reflectionSrc), 0), 100);
 	vec3 specularLight = material.specular * specularConst;
 	
