@@ -23,6 +23,8 @@ public:
 
 		GLuint getID() const;
 
+		GLint GetTextureUnit();
+
 		void bind();
 		
 		void unbind();
@@ -66,6 +68,8 @@ Texture::~Texture()
 }
 
 inline GLuint Texture::getID() const { return this->texture; }
+
+inline GLint Texture::GetTextureUnit() { return this->texture_unit; }
 
 void Texture::bind()
 {

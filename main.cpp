@@ -1,5 +1,5 @@
 #include"libs.h"
-#include"Shader.h"
+#include"Material.h"
 #include"Texture.h"
 
 Vertex vertices[] =
@@ -120,10 +120,12 @@ int main()
 	glBindVertexArray(VAO);
 	#pragma endregion
 
-	#pragma region TEXTURE
+	#pragma region TEXTURE/MATERIAL
 
 	Texture TEXTURE0("Image/mars.jpg", GL_TEXTURE_2D, 0);
 	Texture TEXTURE1("Image/img_test.png", GL_TEXTURE_2D, 1);
+
+	Material material0(glm::vec3(0.1f), glm::vec3(1.0f), glm::vec3(1.0f), TEXTURE0.GetTextureUnit(), TEXTURE1.GetTextureUnit());
 	
 	#pragma endregion
 
@@ -198,8 +200,9 @@ int main()
 		glBindVertexArray(VAO);
 				
 		//Uniformtexture Update
-		core_program.SetVec1i("texture0", 0);
-		core_program.SetVec1i("texture1", 1);
+		core_program.SetVec1i("texture0", TEXTURE0.GetTextureUnit());
+		core_program.SetVec1i("texture1", TEXTURE1.GetTextureUnit());
+		material0.SendToShader(core_program);
 				
 		//Uniform Location Of matrix form vertex.glsl
 		//rotation.y += 1.0f;
