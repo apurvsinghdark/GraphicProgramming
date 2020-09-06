@@ -1,5 +1,6 @@
 #include"libs.h"
 #include"Shader.h"
+#include"Texture.h"
 
 Vertex vertices[] =
 {
@@ -120,63 +121,10 @@ int main()
 	#pragma endregion
 
 	#pragma region TEXTURE
-	//Texture
-	int imageHeight = 0;
-	int imageWidth = 0;
 
-	//Texture0 INIT
-	unsigned char* image = SOIL_load_image("Image/mars.jpg", &imageWidth, &imageHeight, NULL, SOIL_LOAD_RGBA);
-
-	GLuint texture0;
-	glGenTextures(1, &texture0); //Genrating Texture At 0 point
-	glBindTexture(GL_TEXTURE_2D, texture0); //Bind Texture properties with 0 point
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //Scaling at x-axis
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //Scaling at y-axis
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Scaling at Z-axis (Zoom-In) anti-alising
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Scaling at Z-axis (Zoom-Out) aniti-alising
-
-	if (image)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image); //getting image data
-		glGenerateMipmap(GL_TEXTURE_2D); //scaling with mipmap
-	}
-	else
-	{
-		std::cout << "ENABLE_TO_LOAD_TEXTURES" << std::endl;
-	}
-
-	//Unloading
-	glActiveTexture(0); //deactivating
-	glBindTexture(GL_TEXTURE_2D,0); //unibinding
-	SOIL_free_image_data(image);
-
-	//Texture1 INIT
-	image = SOIL_load_image("Image/img_test.png", &imageWidth, &imageHeight, NULL, SOIL_LOAD_RGBA);
-
-	GLuint texture1;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-	if (image)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "TEXTTURE_NOT_LOADED_SUCCESSFULLY" << std::endl;
-	}
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
-
+	Texture TEXTURE0("Image/mars.jpg", GL_TEXTURE_2D, 0);
+	Texture TEXTURE1("Image/img_test.png", GL_TEXTURE_2D, 1);
+	
 	#pragma endregion
 
 	#pragma region MODELLOADING
@@ -250,9 +198,9 @@ int main()
 		glBindVertexArray(VAO);
 				
 		//Uniformtexture Update
-		core_program.SetVec2("texture0", 0);
-		core_program.SetVec2("texture1", 1);
-		
+		core_program.SetVec1i("texture0", 0);
+		core_program.SetVec1i("texture1", 1);
+				
 		//Uniform Location Of matrix form vertex.glsl
 		//rotation.y += 1.0f;
 
@@ -279,13 +227,10 @@ int main()
 		core_program.SetMat4("ProjectionMatrix", ProjectionMatrix);
 		
 		core_program.Use();//re-Init for becoz of SetMat
-		
-		//Activate TEXTURE
-		glActiveTexture(GL_TEXTURE0); // activating textures at O coordinate in GPU
-		glBindTexture(GL_TEXTURE_2D, texture0); //binding
-		
-		glActiveTexture(GL_TEXTURE1); // activating textures at 1 coordinate in GPU
-		glBindTexture(GL_TEXTURE_2D, texture1); //binding
+				
+		//bind N activate texture
+		TEXTURE0.bind();
+		TEXTURE1.bind();
 		
 		//DRAW
 		glDrawElements(GL_TRIANGLES, noOfIndicies, GL_UNSIGNED_INT, 0);
@@ -295,10 +240,10 @@ int main()
 		glFlush();
 
 		//Unbinding
-		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindVertexArray(0);
 		core_program.Unuse();
-		glActiveTexture(0);
+		TEXTURE0.unbind();
+		TEXTURE1.unbind();
 	}
 
 	//FINAL TERMINATE

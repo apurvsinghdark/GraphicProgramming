@@ -24,7 +24,7 @@ public:
 
 	void Unuse();
 
-	void SetVec2(const std::string& name, GLint count);
+	void SetVec1i(const std::string& name, GLint count);
 
 	void SetVec3(const std::string& name, glm::vec3 vector);
 	
@@ -68,7 +68,7 @@ void Shader::Unuse()
 	glUseProgram(0);
 }
 
-void Shader::SetVec2(const std::string& name, GLint count)
+void Shader::SetVec1i(const std::string& name, GLint count)
 {
 	Use();
 	glUniform1i(glGetUniformLocation(this->ID, name.c_str()), count);
