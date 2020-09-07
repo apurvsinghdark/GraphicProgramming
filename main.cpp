@@ -1,6 +1,5 @@
 #include"libs.h"
-#include"Material.h"
-#include"Texture.h"
+#include"Mesh.h"
 
 Vertex vertices[] =
 {
@@ -14,13 +13,13 @@ Vertex vertices[] =
 
 unsigned noOfVertices = sizeof(vertices) / sizeof(Vertex);
 
-GLuint indicies[] =
+GLuint indices[] =
 {
 	0, 1, 2, //Triangle 1
 	2, 3, 0, //Triangle 2
 };
 
-unsigned noOfIndicies = sizeof(indicies) / sizeof(GLuint);
+unsigned noOfIndices = sizeof(indices) / sizeof(GLuint);
 
 void FrameBufferSizeCallBack(GLFWwindow*window,int frameBufferWidth,int frameBufferHeight); //Declaration FrameBUfferFunction
 
@@ -82,6 +81,8 @@ int main()
 	Shader core_program("vertex.glsl", "fragment.glsl");
 		
 	#pragma region BUFFERREADING
+
+	Mesh mesh(vertices, noOfVertices, indices, noOfIndices);
 	//init VAO(Vertex Array) and Bind it
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -97,7 +98,7 @@ int main()
 	GLuint EBO;
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
 	///FOR position
@@ -111,7 +112,7 @@ int main()
 	/// For texture(Texcoord)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
 	glEnableVertexAttribArray(2);
-	
+
 	//Normal
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	glEnableVertexAttribArray(3);
@@ -236,7 +237,9 @@ int main()
 		TEXTURE1.bind();
 		
 		//DRAW
-		glDrawElements(GL_TRIANGLES, noOfIndicies, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, noOfIndices, GL_UNSIGNED_INT, 0);
+
+		mesh.Render(&core_program);
 
 		//END OF DRAW
 		glfwSwapBuffers(window);

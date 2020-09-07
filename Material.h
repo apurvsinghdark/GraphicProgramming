@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef Material.h
 
 #include<glew.h>

@@ -1,4 +1,10 @@
-#include"libs.h"
+#pragma once
+
+#include<iostream>
+#include<glew.h>
+#include<glfw3.h>
+#include<fstream>
+#include<string>
 
 class Shader
 {
