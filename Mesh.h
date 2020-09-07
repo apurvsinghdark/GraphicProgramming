@@ -1,9 +1,9 @@
 #pragma once
 
 #include<iostream>
-#include<vector>
-#include"Material.h"
 #include"Texture.h"
+#include"Material.h"
+#include<vector>
 #include"Vertex.h"
 
 class Mesh
@@ -38,44 +38,50 @@ public:
 	
 	Mesh(
 		Vertex* vertexArray,
-		const unsigned& noOfVertces,
+		const unsigned& noOfVertices,
 		GLuint* indicesArray,
 		const unsigned& noOfIndices
 	);
 
 	~Mesh();
+
+	void Update();
 	
 	void Render(Shader* shader);
 };
 
-void Mesh::InitVertexData(Vertex* vertexArray, const unsigned& noOfVertices, GLuint* indicesArray, const unsigned& noOfIndices)
+void Mesh::InitVertexData(
+		Vertex* vertexArray,
+		const unsigned& noOfVertices,
+		GLuint* indicesArray,
+		const unsigned& noOfIndices
+)
 {
-	for (int i = 0; i < noOfVertices; i++)
+	for (size_t i = 0; i < noOfVertices; i++)
 	{
 		this->vertices.push_back(vertexArray[i]);
 	}
-	for (int i = 0; i < noOfIndices; i++)
+	for (size_t i = 0; i < noOfIndices; i++)
 	{
 		this->indices.push_back(indicesArray[i]);
 	}
 }
 
-inline void Mesh::InitVAO()
+void Mesh::InitVAO()
 {
 	//init VAO(Vertex Array) and Bind it
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	glGenVertexArrays(1, &this->VAO);
+	glBindVertexArray(this->VAO);
 
 	//init VBO and bind
 	glGenBuffers(1, &this->VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), this->vertices.data(), GL_STATIC_DRAW);
 
 	//init EBO and bind
-	GLuint EBO;
-	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &this->EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(GLuint), this->indices.data(), GL_STATIC_DRAW);
 
 	// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
 	///FOR position
@@ -100,6 +106,10 @@ inline void Mesh::InitVAO()
 
 void Mesh::InitModelMatrix()
 {
+	this->position = glm::vec3(0.0f);
+	this->rotation = glm::vec3(0.0f);
+	this->scale = glm::vec3(1.0f);
+
 	this->ModelMatrix = glm::mat4(1.0f);
 	this->ModelMatrix = glm::translate(this->ModelMatrix, this->position);
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -110,7 +120,7 @@ void Mesh::InitModelMatrix()
 
 void Mesh::UpdateUniforms(Shader* shader)
 {
-	shader->SetMat4("ModelMAtrix", this->ModelMatrix);
+	shader->SetMat4("ModelMatrix", this->ModelMatrix);
 }
 
 Mesh::Mesh(
@@ -143,6 +153,7 @@ void Mesh::Render(Shader* shader)
 	}
 	else
 	{
+		//std::cout << sizeof(indices.data()) << std::endl;
 		glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 	}
 }
@@ -150,6 +161,10 @@ void Mesh::Render(Shader* shader)
 Mesh::~Mesh()
 {
 	glDeleteVertexArrays(1, &this->VAO);
-	glDeleteBuffers(1, &this->EBO);
 	glDeleteBuffers(1, &this->VBO);
+	glDeleteBuffers(1, &this->EBO);
+}
+
+void Mesh::Update()
+{
 }

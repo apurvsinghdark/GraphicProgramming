@@ -80,45 +80,45 @@ int main()
 	//vertex & fragment Shaders
 	Shader core_program("vertex.glsl", "fragment.glsl");
 		
+	Mesh mesh(vertices, noOfVertices, indices, noOfIndices);
 	#pragma region BUFFERREADING
 
-	Mesh mesh(vertices, noOfVertices, indices, noOfIndices);
-	//init VAO(Vertex Array) and Bind it
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	////init VAO(Vertex Array) and Bind it
+	//GLuint VAO;
+	//glGenVertexArrays(1, &VAO);
+	//glBindVertexArray(VAO);
 
-	//init VBO and bind
-	GLuint VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	////init VBO and bind
+	//GLuint VBO;
+	//glGenBuffers(1, &VBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//init EBO and bind
-	GLuint EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	////init EBO and bind
+	//GLuint EBO;
+	//glGenBuffers(1, &EBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
-	///FOR position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
+	//// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
+	/////FOR position
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+	//glEnableVertexAttribArray(0);
 
-	/// For Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(1);
+	///// For Color
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	//glEnableVertexAttribArray(1);
 
-	/// For texture(Texcoord)
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
-	glEnableVertexAttribArray(2);
+	///// For texture(Texcoord)
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
+	//glEnableVertexAttribArray(2);
 
-	//Normal
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(3);
+	////Normal
+	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	//glEnableVertexAttribArray(3);
 
-	//Bind Array
-	glBindVertexArray(VAO);
+	////Bind Array
+	//glBindVertexArray(VAO);
 	#pragma endregion
 
 	#pragma region TEXTURE/MATERIAL
@@ -135,7 +135,6 @@ int main()
 	glm::vec3 position(0.0f);
 	glm::vec3 rotation(0.0f);
 	glm::vec3 scale(1.0f);
-
 
 	glm::mat4 ModelMatrix(1.0f);
 	ModelMatrix = glm::translate(ModelMatrix, position);
@@ -197,8 +196,10 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		
+		mesh.Render(&core_program);
+		
 		//Arrays BINDING
-		glBindVertexArray(VAO);
+		//glBindVertexArray(VAO);
 				
 		//Uniformtexture Update
 		core_program.SetVec1i("texture0", TEXTURE0.GetTextureUnit());
@@ -238,8 +239,6 @@ int main()
 		
 		//DRAW
 		//glDrawElements(GL_TRIANGLES, noOfIndices, GL_UNSIGNED_INT, 0);
-
-		mesh.Render(&core_program);
 
 		//END OF DRAW
 		glfwSwapBuffers(window);
