@@ -99,7 +99,9 @@ int main()
 	
 	#pragma endregion
 
-	#pragma region MODELLOADING
+	#pragma region CAMERA
+
+
 	//ModelLoading
 	glm::vec3 camPos(0.0f, 0.0f, 1.0f);
 	glm::vec3 worldUp (0.0f, 1.0f, 0.0f);
