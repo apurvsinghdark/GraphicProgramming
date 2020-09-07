@@ -155,19 +155,12 @@ int main()
 		
 		mesh.Render(&core_program);
 		
-		//Arrays BINDING
-		//glBindVertexArray(VAO);
-				
 		//Uniformtexture Update
 		core_program.SetVec1i("texture0", TEXTURE0.GetTextureUnit());
 		core_program.SetVec1i("texture1", TEXTURE1.GetTextureUnit());
 		material0.SendToShader(core_program);
 				
-		//Uniform Location Of matrix form vertex.glsl
-
-
-
-		//glm::mat4 ProjectionMatrix(1.0f);
+		//Projection(PerspectiveVision)
 		ProjectionMatrix = glm::perspective(
 			glm::radians(fov),
 			static_cast<float>(frameBufferWidth) / frameBufferHeight,
@@ -194,6 +187,8 @@ int main()
 
 		//Unbinding
 		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		core_program.Unuse();
 		TEXTURE0.unbind();
 		TEXTURE1.unbind();

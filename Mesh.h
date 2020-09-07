@@ -50,10 +50,12 @@ public:
 	
 	void Render(Shader* shader);
 
+	//Modifiers
 	void SetPosition(const glm::vec3 position);
 	void SetRotation(const glm::vec3 rotation);
 	void SetScale(const glm::vec3 scale);
 	
+	//Translation/Rotation/Scaling
 	void Move(const glm::vec3 position);
 	void Rotate(const glm::vec3 rotation);
 	void Scale(const glm::vec3 scale);
@@ -174,7 +176,6 @@ void Mesh::Render(Shader* shader)
 	}
 	else
 	{
-		//std::cout << sizeof(indices.data()) << std::endl;
 		glDrawElements(GL_TRIANGLES, this->noOfIndices, GL_UNSIGNED_INT, 0);
 	}
 }

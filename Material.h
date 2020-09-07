@@ -1,7 +1,4 @@
 #pragma once
-
-#ifndef Material.h
-
 #include<glew.h>
 #include<glfw3.h>
 #include"Shader.h"
@@ -58,5 +55,3 @@ void Material::SendToShader(Shader& program)
 	program.SetVec1i("material.diffuseTex", this->diffuseTex);
 	program.SetVec1i("material.specularTex", this->specularTex);
 }
-
-#endif // !Material.h
