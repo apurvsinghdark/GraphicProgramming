@@ -25,7 +25,7 @@ void FrameBufferSizeCallBack(GLFWwindow*window,int frameBufferWidth,int frameBuf
 
 void Input(GLFWwindow* window); //Input declaration
 
-void Input(GLFWwindow* window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale);
+void Input(GLFWwindow* window, Mesh &mesh);
 
 int main()
 {
@@ -80,45 +80,14 @@ int main()
 	//vertex & fragment Shaders
 	Shader core_program("vertex.glsl", "fragment.glsl");
 		
-	Mesh mesh(vertices, noOfVertices, indices, noOfIndices);
 	#pragma region BUFFERREADING
 
-	////init VAO(Vertex Array) and Bind it
-	//GLuint VAO;
-	//glGenVertexArrays(1, &VAO);
-	//glBindVertexArray(VAO);
+	Mesh mesh(vertices, noOfVertices, indices, noOfIndices,
+		glm::vec3(0.0f),
+		glm::vec3(0.0f),
+		glm::vec3(1.0f)
+		);
 
-	////init VBO and bind
-	//GLuint VBO;
-	//glGenBuffers(1, &VBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	////init EBO and bind
-	//GLuint EBO;
-	//glGenBuffers(1, &EBO);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	//// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
-	/////FOR position
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-	//glEnableVertexAttribArray(0);
-
-	///// For Color
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-	//glEnableVertexAttribArray(1);
-
-	///// For texture(Texcoord)
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
-	//glEnableVertexAttribArray(2);
-
-	////Normal
-	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-	//glEnableVertexAttribArray(3);
-
-	////Bind Array
-	//glBindVertexArray(VAO);
 	#pragma endregion
 
 	#pragma region TEXTURE/MATERIAL
@@ -132,17 +101,6 @@ int main()
 
 	#pragma region MODELLOADING
 	//ModelLoading
-	glm::vec3 position(0.0f);
-	glm::vec3 rotation(0.0f);
-	glm::vec3 scale(1.0f);
-
-	glm::mat4 ModelMatrix(1.0f);
-	ModelMatrix = glm::translate(ModelMatrix, position);
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	ModelMatrix = glm::scale(ModelMatrix, scale);
-
 	glm::vec3 camPos(0.0f, 0.0f, 1.0f);
 	glm::vec3 worldUp (0.0f, 1.0f, 0.0f);
 	glm::vec3 camFront(0.0f, 0.0f, -1.0f);
@@ -168,7 +126,6 @@ int main()
 
 	core_program.Use();
 
-	core_program.SetMat4("ModelMatrix", ModelMatrix);
 	core_program.SetMat4("ViewMatrix", ViewMatrix);
 	core_program.SetMat4("ProjectionMatrix", ProjectionMatrix);
 
@@ -191,7 +148,7 @@ int main()
 		glfwPollEvents();
 
 		//UPDATE
-		Input(window, position, rotation, scale);
+		Input(window, mesh);
 		//CLEAR
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -207,18 +164,9 @@ int main()
 		material0.SendToShader(core_program);
 				
 		//Uniform Location Of matrix form vertex.glsl
-		//rotation.y += 1.0f;
 
-		glm::mat4 ModelMatrix(1.0f);
-		ModelMatrix = glm::translate(ModelMatrix, position);
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		ModelMatrix = glm::scale(ModelMatrix, scale);
 
-		core_program.SetMat4("ModelMatrix", ModelMatrix);
-		
-		//glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+
 		//glm::mat4 ProjectionMatrix(1.0f);
 		ProjectionMatrix = glm::perspective(
 			glm::radians(fov),
@@ -271,38 +219,38 @@ void Input(GLFWwindow* window)
 	}
 }
 
-void Input(GLFWwindow* window, glm::vec3 &position,glm::vec3 &rotation, glm::vec3 &scale)
+void Input(GLFWwindow* window, Mesh& mesh)
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		position.z += 0.01f;
+		mesh.Move(glm::vec3(0.0f, 0.0f, 0.1f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		position.z -= 0.01f;
+		mesh.Move(glm::vec3(0.0f, 0.0f, -0.1f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		position.x += 0.01f;
+		mesh.Move(glm::vec3(0.1f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		position.x -= 0.01f;
+		mesh.Move(glm::vec3(-0.1f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		rotation.y -= 1.0f;
+		mesh.Rotate(glm::vec3(0.f, -1.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		rotation.y += 1.0f;
+		mesh.Rotate(glm::vec3(0.f, 1.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 	{
-		scale += 0.01f;
+		mesh.Scale(glm::vec3(0.1f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 	{
-		scale -= 0.01f;
+		mesh.Scale(glm::vec3(-0.1f));
 	}
 }
