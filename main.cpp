@@ -1,25 +1,6 @@
 #include"libs.h"
 #include"Mesh.h"
-
-Vertex vertices[] =
-{
-	///position						//color							//texcoord					//Normal
-	glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,1.0f),		glm::vec3(0.0f,0.0f,1.0f),
-	glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,0.0f),		glm::vec3(0.0f,0.0f,1.0f),
-	glm::vec3(0.5f,-0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,0.0f),		glm::vec3(0.0f,0.0f,1.0f),
-	glm::vec3(0.5f, 0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,1.0f),		glm::vec3(0.0f,0.0f,1.0f),
-																	
-};
-
-unsigned noOfVertices = sizeof(vertices) / sizeof(Vertex);
-
-GLuint indices[] =
-{
-	0, 1, 2, //Triangle 1
-	2, 3, 0, //Triangle 2
-};
-
-unsigned noOfIndices = sizeof(indices) / sizeof(GLuint);
+#include"Primitives.h"
 
 void FrameBufferSizeCallBack(GLFWwindow*window,int frameBufferWidth,int frameBufferHeight); //Declaration FrameBUfferFunction
 
@@ -29,6 +10,8 @@ void Input(GLFWwindow* window, Mesh &mesh);
 
 int main()
 {
+	//Init Primitive
+	Quad Quad;
 	// GLFW INITIALIZATION
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -82,7 +65,8 @@ int main()
 		
 	#pragma region BUFFERREADING
 
-	Mesh mesh(vertices, noOfVertices, indices, noOfIndices,
+	Mesh mesh( 
+		&Quad,
 		glm::vec3(0.0f),
 		glm::vec3(0.0f),
 		glm::vec3(1.0f)
