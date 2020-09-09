@@ -1,6 +1,4 @@
-#include"libs.h"
-#include"Mesh.h"
-#include"Primitives.h"
+#include"Game.h"
 
 void FrameBufferSizeCallBack(GLFWwindow*window,int frameBufferWidth,int frameBufferHeight); //Declaration FrameBUfferFunction
 
@@ -11,7 +9,7 @@ void Input(GLFWwindow* window, Mesh &mesh);
 GLFWwindow* createWindow(
 	const std::string title,
 	const int width, const int height,
-	int& fbWidth, int& gbHeight,
+	int& fbWidth, int& fbHeight,
 	const int majorVersion, const int minorVersion,
 	bool resizeable);
 
@@ -32,7 +30,7 @@ int main()
 	int frameBufferHeight = WINDOW_HEIGHT;
 
 	//Creating Window
-	GLFWwindow* window = createWindow("GP_UP", WINDOW_WIDTH, WINDOW_HEIGHT, frameBufferWidth, frameBufferHeight, GLmajorVersion, GLminorVersion, false);
+	GLFWwindow* window = createWindow("GP_UP", WINDOW_WIDTH, WINDOW_HEIGHT, frameBufferWidth, frameBufferHeight, GLmajorVersion, GLminorVersion, true);
 
 	//GLEW INITIALIZATION
 	glewInit();
