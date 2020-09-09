@@ -8,29 +8,31 @@ void Input(GLFWwindow* window); //Input declaration
 
 void Input(GLFWwindow* window, Mesh &mesh);
 
+GLFWwindow* createWindow(
+	const std::string title,
+	const int width, const int height,
+	int& fbWidth, int& gbHeight,
+	const int majorVersion, const int minorVersion,
+	bool resizeable);
+
 int main()
 {
-	//Init Primitive
-	Quad Quad;
 	// GLFW INITIALIZATION
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);	
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	
+	//Init Primitive
+	Quad Quad;
+	
 	//Create Window
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 640;
-	int frameBufferWidth = 0;
-	int frameBufferHeight = 0;
+	const int GLmajorVersion = 4;
+	const int GLminorVersion = 5;
+	int frameBufferWidth = WINDOW_WIDTH;
+	int frameBufferHeight = WINDOW_HEIGHT;
 
-	GLFWwindow* window;
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "GP_UP", nullptr, nullptr);
-
-	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallBack); //Give CallBack Of recent activity of Window Resizing (Calling)
-	
-	glfwMakeContextCurrent(window);
+	//Creating Window
+	GLFWwindow* window = createWindow("GP_UP", WINDOW_WIDTH, WINDOW_HEIGHT, frameBufferWidth, frameBufferHeight, GLmajorVersion, GLminorVersion, false);
 
 	//GLEW INITIALIZATION
 	glewInit();
@@ -61,7 +63,7 @@ int main()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//set the polygon into Fill or Skeleton(GL_LINES)
 	
 	//vertex & fragment Shaders
-	Shader core_program("vertex.glsl", "fragment.glsl");
+	Shader core_program(GLmajorVersion, GLminorVersion, "vertex.glsl", "fragment.glsl");
 		
 	#pragma region BUFFERREADING
 
@@ -84,7 +86,6 @@ int main()
 	#pragma endregion
 
 	#pragma region CAMERA
-
 
 	//ModelLoading
 	glm::vec3 camPos(0.0f, 0.0f, 1.0f);
@@ -234,4 +235,27 @@ void Input(GLFWwindow* window, Mesh& mesh)
 	{
 		mesh.Scale(glm::vec3(-0.1f));
 	}
+}
+
+GLFWwindow* createWindow(
+	const std::string title,
+	const int width, const int height,
+	int& fbWidth, int& fbHeight,
+	const int majorVersion, const int minorVersion,
+	bool resizeable)
+{
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majorVersion);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minorVersion);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, resizeable);
+
+	GLFWwindow* window;
+	window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+
+	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallBack); //Give CallBack Of recent activity of Window Resizing (Calling)
+
+	glfwMakeContextCurrent(window);
+	
+	return window;
 }
