@@ -7,6 +7,13 @@
 #include<string>
 #include<vector>
 
+#include"Shader.h"
+#include"Texture.h"
+#include"Material.h"
+#include"Mesh.h"
+#include"Vertex.h"
+#include"Primitives.h"
+
 //Math Includes Library
 #include<glm.hpp>
 #include<gtc/matrix_transform.hpp>
