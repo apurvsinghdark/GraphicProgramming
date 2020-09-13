@@ -4,7 +4,7 @@
 
 //Enumetrator
 enum shader_enum { ENUM_SHADER0 = 0 };
-enum texture_enum { ENUM_TEXTURE0 = 0, ENUM_TEXTURE1 = 1 };
+enum texture_enum { ENUM_TEXTURE0 = 0, ENUM_TEXTURE0_SPECULAR, ENUM_TEXTURE1, ENUM_TEXTURE1_SPECULAR};
 enum material_enum { ENUM_MATERIAL0 = 0 };
 enum mesh_enum { ENUM_MESH0 = 0 };
 
@@ -178,7 +178,10 @@ void Game::InitShaders()
 void Game::InitTextures()
 {
 	this->textures.push_back(new Texture("Image/mars.jpg", GL_TEXTURE_2D));
-	this->textures.push_back(new Texture("Image/img_test.png", GL_TEXTURE_2D));
+	this->textures.push_back(new Texture("Image/download.png", GL_TEXTURE_2D));
+
+	this->textures.push_back(new Texture("Image/container.png", GL_TEXTURE_2D));
+	this->textures.push_back(new Texture("Image/container_specular.png", GL_TEXTURE_2D));
 }
 
 void Game::InitMaterials()
@@ -214,8 +217,6 @@ void Game::InitUniforms()
 
 void Game::UpdateUniforms()
 {
-	this->materials[ENUM_MATERIAL0]->SendToShader(*this->shaders[ENUM_SHADER0]);
-
 	glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
 	//Projection(PerspectiveVision)
 	ProjectionMatrix = glm::perspective(
@@ -286,9 +287,6 @@ void Game::Update()
 
 void Game::Render()
 {
-	//UPDATE
-	//Input(window, mesh);
-
 	//CLEAR
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -296,11 +294,13 @@ void Game::Render()
 	//Update Uniforms
 	UpdateUniforms();
 
+	this->materials[ENUM_MATERIAL0]->SendToShader(*this->shaders[ENUM_SHADER0]);
+
 	this->shaders[ENUM_SHADER0]->Use();//re-Init for becoz of SetMat
 
 	//bind N activate texture
-	this->textures[ENUM_TEXTURE0]->bind(0);
-	this->textures[ENUM_TEXTURE1]->bind(1);
+	this->textures[ENUM_TEXTURE1]->bind(0);
+	this->textures[ENUM_TEXTURE1_SPECULAR]->bind(1);
 
 	//DRAW
 	this->meshes[ENUM_MESH0]->Render(this->shaders[ENUM_SHADER0]);
@@ -383,5 +383,13 @@ void Game::Input(GLFWwindow* window, Mesh& mesh)
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 	{
 		mesh.Scale(glm::vec3(-0.1f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		mesh.Move(glm::vec3(0.0f, 0.1f, 0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		mesh.Move(glm::vec3(0.0f, -0.1f, 0.0f));
 	}
 }

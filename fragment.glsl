@@ -41,7 +41,7 @@ vec3 SpecularLight(Material material, vec3 vs_position, vec3 vs_normal, vec3 lig
 	vec3 reflectionSrc = normalize(reflect(specLightDir,vs_normal)); // Light Coming From Source
 	vec3 reflectOnEye = normalize(camPos - vs_position); // reflection on eye
 	float specularConst = pow(max(dot(reflectOnEye, reflectionSrc), 0), 100);
-	vec3 specularLight = material.specular * specularConst;
+	vec3 specularLight = material.specular * specularConst * texture(material.specularTex, vs_texcoord).rgb;
 	
 	return specularLight;
 }
