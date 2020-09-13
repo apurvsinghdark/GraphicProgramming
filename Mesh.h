@@ -174,7 +174,7 @@ void Mesh::UpdateModelMatrix()
 	this->ModelMatrix = glm::mat4(1.0f);
 	this->ModelMatrix = glm::translate(this->ModelMatrix, this->position);
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.y * (float)glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	this->ModelMatrix = glm::scale(this->ModelMatrix, this->scale);
 }

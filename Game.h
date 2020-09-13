@@ -4,7 +4,7 @@
 
 //Enumetrator
 enum shader_enum { ENUM_SHADER0 = 0 };
-enum texture_enum { ENUM_TEXTURE0 = 0, ENUM_TEXTURE0_SPECULAR, ENUM_TEXTURE1, ENUM_TEXTURE1_SPECULAR};
+enum texture_enum { ENUM_TEXTURE0 = 0, ENUM_TEXTURE0_SPECULAR, ENUM_TEXTURE1, ENUM_TEXTURE1_SPECULAR };
 enum material_enum { ENUM_MATERIAL0 = 0 };
 enum mesh_enum { ENUM_MESH0 = 0, ENUM_MESH1};
 
@@ -82,11 +82,10 @@ public:
 
 	void Render();
 
+	void UpdateInput();
 	//Static funcs
 
 	static void FrameBufferSizeCallBack(GLFWwindow* window, int frameBufferWidth, int frameBufferHeight); //Decleration FrameBUfferFunction
-	static void Input(GLFWwindow* window);
-	static void Input(GLFWwindow* window, Mesh& mesh);
 };
 
 void Game::initGLFW()
@@ -225,12 +224,17 @@ void Game::InitUniforms()
 void Game::UpdateUniforms()
 {
 	glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
+
+	this->ViewMatrix = glm::lookAt(this->camPos, this->camPos + this->camFront, this->worldUp);
+
+	this->shaders[ENUM_SHADER0]->SetMat4("ViewMatrix", this->ViewMatrix);
+
 	//Projection(PerspectiveVision)
-	ProjectionMatrix = glm::perspective(
+	this->ProjectionMatrix = glm::perspective(
 		glm::radians(fov),
-		static_cast<float>(frameBufferWidth) / frameBufferHeight,
-		nearPlane,
-		farPlane
+		static_cast<float>(this->frameBufferWidth) / this->frameBufferHeight,
+		this->nearPlane,
+		this->farPlane
 	);
 
 	this->shaders[ENUM_SHADER0]->SetMat4("ProjectionMatrix", this->ProjectionMatrix);
@@ -288,8 +292,7 @@ void Game::Update()
 {
 	//CALL INPUT EVENTS
 	glfwPollEvents();
-	Input(this->window);
-	Input(this->window, *this->meshes[ENUM_MESH0]);
+	UpdateInput();
 }
 
 void Game::Render()
@@ -351,54 +354,35 @@ void Game::FrameBufferSizeCallBack(GLFWwindow* window, int frameBufferWidth, int
 	glViewport(0, 0, frameBufferWidth, frameBufferHeight);
 }
 
-void Game::Input(GLFWwindow* window)
+
+void Game::UpdateInput()
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		glfwSetWindowShouldClose(this->window, GL_TRUE);
 	}
-}
-
-void Game::Input(GLFWwindow* window, Mesh& mesh)
-{
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(0.0f, 0.0f, 0.1f));
+		this->camPos.z -= 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(0.0f, 0.0f, -0.1f));
+		this->camPos.z += 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(0.1f, 0.0f, 0.0f));
+		this->camPos.x -= 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(-0.1f, 0.0f, 0.0f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-	{
-		mesh.Rotate(glm::vec3(0.f, -1.0f, 0.0f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-	{
-		mesh.Rotate(glm::vec3(0.f, 1.0f, 0.0f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-	{
-		mesh.Scale(glm::vec3(0.1f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-	{
-		mesh.Scale(glm::vec3(-0.1f));
+		this->camPos.x += 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(0.0f, -0.1f, 0.0f));
+		this->camPos.y += 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(0.0f, 0.1f, 0.0f));
+		this->camPos.y -= 0.1f;
 	}
 }
