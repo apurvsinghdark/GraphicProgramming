@@ -16,25 +16,21 @@ private:
 	int imageHeight;
 
 	GLuint type;
-	GLint texture_unit;
 
 public:
-	Texture(const std::string name, GLenum type, GLint texture_unit);
+	Texture(const std::string name, GLenum type);
 		
 		~Texture();
 
 		GLuint getID() const;
 
-		GLint GetTextureUnit();
-
-		void bind();
+		void bind(const GLint texture_unit);
 		
 		void unbind();
 };
 
-Texture::Texture(const std::string name, GLenum type, GLint texture_unit)
+Texture::Texture(const std::string name, GLenum type)
 {
-	this->texture_unit = texture_unit;
 	this->type = type;
 	//Texture INIT
 	unsigned char* image = SOIL_load_image(name.c_str(), &this->imageWidth, &this->imageHeight, NULL, SOIL_LOAD_RGBA);
@@ -71,11 +67,9 @@ Texture::~Texture()
 
 inline GLuint Texture::getID() const { return this->texture; }
 
-inline GLint Texture::GetTextureUnit() { return this->texture_unit; }
-
-void Texture::bind()
+void Texture::bind(const GLint texture_unit)
 {
-	glActiveTexture(GL_TEXTURE0 + this->texture_unit);
+	glActiveTexture(GL_TEXTURE0 + texture_unit);
 	glBindTexture(this->type, this->texture);
 }
 
