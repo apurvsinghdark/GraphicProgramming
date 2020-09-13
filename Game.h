@@ -6,7 +6,7 @@
 enum shader_enum { ENUM_SHADER0 = 0 };
 enum texture_enum { ENUM_TEXTURE0 = 0, ENUM_TEXTURE0_SPECULAR, ENUM_TEXTURE1, ENUM_TEXTURE1_SPECULAR};
 enum material_enum { ENUM_MATERIAL0 = 0 };
-enum mesh_enum { ENUM_MESH0 = 0 };
+enum mesh_enum { ENUM_MESH0 = 0, ENUM_MESH1};
 
 class Game
 {
@@ -177,11 +177,11 @@ void Game::InitShaders()
 
 void Game::InitTextures()
 {
-	this->textures.push_back(new Texture("Image/mars.jpg", GL_TEXTURE_2D));
-	this->textures.push_back(new Texture("Image/download.png", GL_TEXTURE_2D));
-
 	this->textures.push_back(new Texture("Image/container.png", GL_TEXTURE_2D));
 	this->textures.push_back(new Texture("Image/container_specular.png", GL_TEXTURE_2D));
+	
+	this->textures.push_back(new Texture("Image/mars.jpg", GL_TEXTURE_2D));
+	this->textures.push_back(new Texture("Image/download.png", GL_TEXTURE_2D));
 }
 
 void Game::InitMaterials()
@@ -193,8 +193,15 @@ void Game::InitMaterials()
 void Game::InitMeshes()
 {
 	this->meshes.push_back(new Mesh(
-		&Quad(),
+		&Pyramid(),
 		glm::vec3(0.0f),
+		glm::vec3(0.0f),
+		glm::vec3(1.0f)
+	)
+	);
+	this->meshes.push_back(new Mesh(
+		&Pyramid(),
+		glm::vec3(1.0f),
 		glm::vec3(0.0f),
 		glm::vec3(1.0f)
 	)
@@ -299,11 +306,13 @@ void Game::Render()
 	this->shaders[ENUM_SHADER0]->Use();//re-Init for becoz of SetMat
 
 	//bind N activate texture
-	this->textures[ENUM_TEXTURE1]->bind(0);
-	this->textures[ENUM_TEXTURE1_SPECULAR]->bind(1);
+	this->textures[ENUM_TEXTURE0]->bind(0);
+	this->textures[ENUM_TEXTURE0_SPECULAR]->bind(1);
 
 	//DRAW
 	this->meshes[ENUM_MESH0]->Render(this->shaders[ENUM_SHADER0]);
+	
+	this->meshes[ENUM_MESH1]->Render(this->shaders[ENUM_SHADER0]);
 
 	//END OF DRAW
 	glfwSwapBuffers(this->window);
@@ -386,10 +395,10 @@ void Game::Input(GLFWwindow* window, Mesh& mesh)
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(0.0f, 0.1f, 0.0f));
+		mesh.Move(glm::vec3(0.0f, -0.1f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		mesh.Move(glm::vec3(0.0f, -0.1f, 0.0f));
+		mesh.Move(glm::vec3(0.0f, 0.1f, 0.0f));
 	}
 }

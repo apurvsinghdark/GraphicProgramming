@@ -93,3 +93,47 @@ Quad::Quad() : Primitive()
 Quad::~Quad()
 {
 }
+
+class Pyramid : public Primitive
+{
+private:
+public:
+	Pyramid();
+	~Pyramid();
+};
+
+Pyramid::Pyramid()
+	:  Primitive()
+{
+	Vertex vertices[] =
+	{
+		///position						//color							//texcoord					//Normal
+		glm::vec3(0.f,0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.5f,1.0f),		glm::vec3(0.0f,0.0f,1.0f),
+		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,0.0f),		glm::vec3(0.0f,0.0f,1.0f),
+		glm::vec3(0.5f,-0.5f,0.5f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,0.0f),		glm::vec3(0.0f,0.0f,1.0f),
+		
+		///position						//color							//texcoord					//Normal
+		glm::vec3(0.0f,0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.5f,1.0f),		glm::vec3(-1.0f,0.0f,0.0f),
+		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,0.0f),		glm::vec3(-1.0f,0.0f,0.0f),
+		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,0.0f),		glm::vec3(-1.0f,0.0f,0.0f),
+		
+		///position						//color							//texcoord					//Normal
+		glm::vec3(0.0f,0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.5f,1.0f),		glm::vec3(0.0f,0.0f,-1.0f),
+		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,0.0f),		glm::vec3(0.0f,0.0f,-1.0f),
+		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,0.0f),		glm::vec3(0.0f,0.0f,-1.0f),
+		
+		///position						//color							//texcoord					//Normal
+		glm::vec3(0.0f,0.5f,0.0f),		glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.5f,1.0f),		glm::vec3(1.0f,0.0f,0.0f),
+		glm::vec3(0.5f,-0.5f,0.5f), 	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(0.0f,0.0f),		glm::vec3(1.0f,0.0f,0.0f),
+		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f,1.0f,1.0f),		glm::vec2(1.0f,0.0f),		glm::vec3(1.0f,0.0f,0.0f),
+
+	};
+	
+	unsigned noOfVertices = sizeof(vertices) / sizeof(Vertex);
+
+	this->SetVertex(vertices, noOfVertices, nullptr, 0);
+}
+
+Pyramid::~Pyramid()
+{
+}
