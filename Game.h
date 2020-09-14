@@ -21,6 +21,19 @@ private:
 	int frameBufferWidth;
 	int frameBufferHeight;
 
+	//Inputs/Time
+	float deltaTime;
+	float curFrameTime;
+	float lastFrameTime;
+
+	double mouseX;
+	double mouseY;
+	double lastMouseX;
+	double lastMouseY;
+	double mouseOffsetX;
+	double mouseOffsetY;
+	bool firstMouse;
+
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
 	
@@ -82,7 +95,11 @@ public:
 
 	void Render();
 
+	void UpdateDeltaTime();
 	void UpdateInput();
+	void UpdateMouseInput();
+	void UpdateKeyBoardInput();
+
 	//Static funcs
 
 	static void FrameBufferSizeCallBack(GLFWwindow* window, int frameBufferWidth, int frameBufferHeight); //Decleration FrameBUfferFunction
@@ -151,6 +168,8 @@ void Game::InitOpenGLOptions()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Game::InitMartices()
@@ -254,6 +273,18 @@ Game::Game(
 	this->frameBufferWidth = this->WINDOW_WIDTH;
 	this->frameBufferHeight = this->WINDOW_HEIGHT;
 
+	this->deltaTime = 0.0f;
+	this->curFrameTime = 0.0f;
+	this->lastFrameTime = 0.0f;
+
+	this->mouseX = 0.0;
+	this->mouseY = 0.0;
+	this->lastMouseX = 0.0;
+	this->lastMouseY = 0.0;
+	this->mouseOffsetX = 0.0;
+	this->mouseOffsetY = 0.0;
+	this->firstMouse = true;
+
 	this->camPos = glm::vec3(0.0f, 0.0f, 1.0f);
 	this->worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	this->camFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -291,8 +322,8 @@ void Game::SetWindowShouldClose()
 void Game::Update()
 {
 	//CALL INPUT EVENTS
-	glfwPollEvents();
 	UpdateInput();
+	UpdateDeltaTime();
 }
 
 void Game::Render()
@@ -354,8 +385,40 @@ void Game::FrameBufferSizeCallBack(GLFWwindow* window, int frameBufferWidth, int
 	glViewport(0, 0, frameBufferWidth, frameBufferHeight);
 }
 
+void Game::UpdateDeltaTime()
+{
+	this->curFrameTime = static_cast<float>(glfwGetTime());
+	this->deltaTime = this->curFrameTime - this->lastFrameTime;
+	this->lastFrameTime = this->curFrameTime;
+}
 
 void Game::UpdateInput()
+{
+	glfwPollEvents();
+
+	this->UpdateKeyBoardInput();
+	this->UpdateMouseInput();
+}
+
+void Game::UpdateMouseInput()
+{
+	glfwGetCursorPos(this->window, &this->mouseX, &this->mouseY);
+
+	if (firstMouse)
+	{
+		this->lastMouseX = this->mouseX;
+		this->lastMouseY = this->mouseY;
+		this->firstMouse = false;
+	}
+
+	this->mouseOffsetX = this->mouseX - this->lastMouseX;
+	this->mouseOffsetY = this->lastMouseY - this->mouseY;
+
+	this->lastMouseX = this->mouseX;
+	this->lastMouseY = this->mouseY;
+}
+
+void Game::UpdateKeyBoardInput()
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
