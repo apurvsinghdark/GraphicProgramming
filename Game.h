@@ -237,7 +237,6 @@ void Game::InitUniforms()
 	this->shaders[ENUM_SHADER0]->SetMat4("ProjectionMatrix", this->ProjectionMatrix);
 
 	this->shaders[ENUM_SHADER0]->SetVec3("lightPos0", *this->lights[0]);
-	this->shaders[ENUM_SHADER0]->SetVec3("camPos", this->camPos);
 }
 
 void Game::UpdateUniforms()
@@ -247,6 +246,7 @@ void Game::UpdateUniforms()
 	this->ViewMatrix = glm::lookAt(this->camPos, this->camPos + this->camFront, this->worldUp);
 
 	this->shaders[ENUM_SHADER0]->SetMat4("ViewMatrix", this->ViewMatrix);
+	this->shaders[ENUM_SHADER0]->SetVec3("camPos", this->camPos);
 
 	//Projection(PerspectiveVision)
 	this->ProjectionMatrix = glm::perspective(
