@@ -324,6 +324,9 @@ void Game::Update()
 	//CALL INPUT EVENTS
 	UpdateInput();
 	UpdateDeltaTime();
+
+	////Update Roatation
+	//this->meshes[ENUM_MESH1]->Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Game::Render()
