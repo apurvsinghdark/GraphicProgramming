@@ -3,7 +3,7 @@
 int main()
 {
 	//Game Class INIT
-	Game game("GP_UP", 800, 640, 4, 5, false);
+	Game game("GP_UP", 800, 640, 4, 4, false);
 	
 	//UpdateLoop
 	while (!game.GetWindowShouldClose())

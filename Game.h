@@ -1,6 +1,7 @@
 #pragma once
 
 #include"libs.h"
+#include"Camera.h"
 
 //Enumetrator
 enum shader_enum { ENUM_SHADER0 = 0 };
@@ -33,6 +34,9 @@ private:
 	double mouseOffsetX;
 	double mouseOffsetY;
 	bool firstMouse;
+
+	//Camera
+	Camera camera;
 
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
@@ -243,7 +247,8 @@ void Game::UpdateUniforms()
 {
 	glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
 
-	this->ViewMatrix = glm::lookAt(this->camPos, this->camPos + this->camFront, this->worldUp);
+	this->ViewMatrix = this->camera.GetViewMatrix();
+	//this->ViewMatrix = glm::lookAt(this->camPos, this->camPos + this->camFront, this->worldUp);
 
 	this->shaders[ENUM_SHADER0]->SetMat4("ViewMatrix", this->ViewMatrix);
 	this->shaders[ENUM_SHADER0]->SetVec3("camPos", this->camPos);
@@ -267,7 +272,8 @@ Game::Game(
 	bool resizeable
 )
 	: WINDOW_WIDTH(width), WINDOW_HEIGHT(height),
-	GL_MajorVersion(majorVersion), GL_MinorVersion(minorVersion)
+	GL_MajorVersion(majorVersion), GL_MinorVersion(minorVersion),
+	camera(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f))
 {
 	this->window = nullptr;
 	this->frameBufferWidth = this->WINDOW_WIDTH;
@@ -285,7 +291,7 @@ Game::Game(
 	this->mouseOffsetY = 0.0;
 	this->firstMouse = true;
 
-	this->camPos = glm::vec3(0.0f, 0.0f, 1.0f);
+	this->camPos = this->camera.GetPosition();
 	this->worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	this->camFront = glm::vec3(0.0f, 0.0f, -1.0f);
 
@@ -401,6 +407,7 @@ void Game::UpdateInput()
 
 	this->UpdateKeyBoardInput();
 	this->UpdateMouseInput();
+	this->camera.UpdateInput(deltaTime, -1, this->mouseOffsetX, this->mouseOffsetY);
 }
 
 void Game::UpdateMouseInput()
@@ -429,26 +436,26 @@ void Game::UpdateKeyBoardInput()
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		this->camPos.z -= 0.1f;
+		this->camera.Move(deltaTime, FORWARD);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		this->camPos.z += 0.1f;
+		this->camera.Move(deltaTime, BACKWARD);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		this->camPos.x -= 0.1f;
+		this->camera.Move(deltaTime, LEFT);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		this->camPos.x += 0.1f;
+		this->camera.Move(deltaTime, RIGHT);
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	/*if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
 		this->camPos.y += 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
 		this->camPos.y -= 0.1f;
-	}
+	}*/
 }
