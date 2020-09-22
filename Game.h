@@ -53,6 +53,7 @@ private:
 	std::vector<Texture*> textures;
 	std::vector<Material*> materials;
 	std::vector<Mesh*> meshes;
+	std::vector<Model*> models;
 	std::vector<glm::vec3*> lights;
 
 	//private funcs
@@ -69,6 +70,7 @@ private:
 	void InitTextures();
 	void InitMaterials();
 	void InitMeshes();
+	void InitModels();
 	void InitLights();
 	void InitUniforms();
 
@@ -230,6 +232,11 @@ void Game::InitMeshes()
 	);
 }
 
+void Game::InitModels()
+{
+	this->models.push_back(new Model(glm::vec3(0.0f), materials[0], textures[ENUM_TEXTURE0], textures[ENUM_TEXTURE0_SPECULAR], meshes));
+}
+
 void Game::InitLights()
 {
 	this->lights.push_back(new glm::vec3(0.0f, 0.0f, 2.0f));
@@ -310,6 +317,7 @@ Game::Game(
 	this->InitTextures();
 	this->InitMaterials();
 	this->InitMeshes();
+	this->InitModels();
 	this->InitLights();
 	this->InitUniforms();
 }
@@ -342,20 +350,9 @@ void Game::Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//Update Uniforms
-	UpdateUniforms();
-
-	this->materials[ENUM_MATERIAL0]->SendToShader(*this->shaders[ENUM_SHADER0]);
-
-	this->shaders[ENUM_SHADER0]->Use();//re-Init for becoz of SetMat
-
-	//bind N activate texture
-	this->textures[ENUM_TEXTURE0]->bind(0);
-	this->textures[ENUM_TEXTURE0_SPECULAR]->bind(1);
-
-	//DRAW
-	this->meshes[ENUM_MESH0]->Render(this->shaders[ENUM_SHADER0]);
+	this->UpdateUniforms();
 	
-	this->meshes[ENUM_MESH1]->Render(this->shaders[ENUM_SHADER0]);
+	this->models[0]->Render(this->shaders[ENUM_SHADER0]);
 
 	//END OF DRAW
 	glfwSwapBuffers(this->window);
@@ -381,6 +378,9 @@ Game::~Game()
 
 	for (size_t i = 0; i < this->meshes.size(); i++)
 		delete this->meshes[i];
+	
+	for (auto&i : this->models)
+		delete i;
 
 	for (size_t i = 0; i < this->lights.size(); i++)
 		delete this->lights[i];
