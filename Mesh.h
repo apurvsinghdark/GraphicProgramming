@@ -10,7 +10,9 @@
 class Mesh
 {
 private:
+	Vertex* vertexArray;
 	unsigned noOfVertices;
+	GLuint* indexArray;
 	unsigned noOfIndices;
 
 	GLuint VAO;
@@ -23,14 +25,7 @@ private:
 
 	glm::mat4 ModelMatrix;
 
-	void InitVAO(
-		Vertex* vertexArray,
-		const unsigned& noOfVertices,
-		GLuint* indexArray,
-		const unsigned& noOfIndices
-	);
-
-	void InitVAO(Primitive* primitive);
+	void InitVAO();
 
 	void UpdateUniforms(Shader* shader);
 
@@ -54,6 +49,8 @@ public:
 		glm::vec3 scale = glm::vec3(1.0f)
 	);
 
+	Mesh(const Mesh& obj);
+
 	~Mesh();
 
 	void Update();
@@ -71,17 +68,9 @@ public:
 	void Scale(const glm::vec3 scale);
 };
 
-void Mesh::InitVAO(
-	Vertex* vertexArray,
-	const unsigned& noOfVertices,
-	GLuint* indexArray,
-	const unsigned& noOfIndices
-)
-{
-	//init vertex
-	this->noOfVertices = noOfVertices;
-	this->noOfIndices = noOfIndices;
 
+void Mesh::InitVAO()
+{
 	//init VAO(Vertex Array) and Bind it
 	glGenVertexArrays(1, &this->VAO);
 	glBindVertexArray(this->VAO);
@@ -89,58 +78,14 @@ void Mesh::InitVAO(
 	//init VBO and bind
 	glGenBuffers(1, &this->VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	glBufferData(GL_ARRAY_BUFFER, this->noOfVertices * sizeof(Vertex), vertexArray, GL_STATIC_DRAW);
-
-	//init EBO and bind
-	if (this->noOfIndices > 0)
-	{ 
-		glGenBuffers(1, &this->EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->noOfIndices * sizeof(GLuint), indexArray, GL_STATIC_DRAW);
-	}
-
-	// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
-	///FOR position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
-
-	/// For Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(1);
-
-	/// For texture(Texcoord)
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
-	glEnableVertexAttribArray(2);
-
-	//Normal
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(3);
-
-	//Bind Array
-	glBindVertexArray(this->VAO);
-}
-
-void Mesh::InitVAO(Primitive* primitive)
-{
-	//init vertex
-	this->noOfVertices = primitive->GetNoOfVertices();
-	this->noOfIndices = primitive->GetNoOfIndices();
-
-	//init VAO(Vertex Array) and Bind it
-	glGenVertexArrays(1, &this->VAO);
-	glBindVertexArray(this->VAO);
-
-	//init VBO and bind
-	glGenBuffers(1, &this->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	glBufferData(GL_ARRAY_BUFFER, this->noOfVertices * sizeof(Vertex), primitive->GetVertices(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->noOfVertices * sizeof(Vertex), this->vertexArray, GL_STATIC_DRAW);
 
 	//init EBO and bind
 	if ( this->noOfIndices > 0 )
 	{
 		glGenBuffers(1, &this->EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->noOfIndices * sizeof(GLuint), primitive->GetIndices(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->noOfIndices * sizeof(GLuint), this->indexArray, GL_STATIC_DRAW);
 	}
 
 	// Set ATTRIBPOINTERS and ATTRIBARRAYS (Input Assembly)
@@ -185,7 +130,22 @@ Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 rotation, glm::ve
 	this->rotation = rotation;
 	this->scale = scale;
 
-	this->InitVAO(primitive);
+	this->noOfVertices = primitive->GetNoOfVertices();
+	this->noOfIndices = primitive->GetNoOfIndices();
+
+	this->vertexArray = new Vertex[this->noOfVertices];
+	for (size_t i = 0; i < this->noOfVertices; i++)
+	{
+		this->vertexArray[i] = primitive->GetVertices()[i];
+	}
+
+	this->indexArray = new GLuint[this->noOfIndices];
+	for (size_t i = 0; i < this->noOfIndices; i++)
+	{
+		this->indexArray[i] = primitive->GetIndices()[i];
+	}
+
+	this->InitVAO();
 	this->UpdateModelMatrix();
 }
 
@@ -203,7 +163,47 @@ Mesh::Mesh(
 	this->rotation = rotation;
 	this->scale = scale;
 
-	this->InitVAO(vertexArray, noOfVertices, indexArray, noOfIndices);
+	this->noOfVertices = noOfVertices;
+	this->noOfIndices = noOfIndices;
+
+	this->vertexArray = new Vertex[this->noOfVertices];
+	for (size_t i = 0; i < noOfVertices; i++)
+	{
+		this->vertexArray[i] = vertexArray[i];
+	}
+	
+	this->indexArray = new GLuint[this->noOfIndices];
+	for (size_t i = 0; i < noOfIndices; i++)
+	{
+		this->indexArray[i] = indexArray[i];
+	}
+
+	this->InitVAO();
+	this->UpdateModelMatrix();
+}
+
+Mesh::Mesh(const Mesh& obj)
+{
+	this->position = obj.position;
+	this->rotation = obj.rotation;
+	this->scale = obj.scale;
+
+	this->noOfVertices = obj.noOfVertices;
+	this->noOfIndices = obj.noOfIndices;
+
+	this->vertexArray = new Vertex[this->noOfVertices];
+	for (size_t i = 0; i < this->noOfVertices; i++)
+	{
+		this->vertexArray[i] = obj.vertexArray[i];
+	}
+
+	this->indexArray = new GLuint[this->noOfIndices];
+	for (size_t i = 0; i < this->noOfIndices; i++)
+	{
+		this->indexArray[i] = obj.indexArray[i];
+	}
+
+	this->InitVAO();
 	this->UpdateModelMatrix();
 }
 
@@ -245,6 +245,9 @@ Mesh::~Mesh()
 	
 	if (this->noOfIndices > 0)
 		glDeleteBuffers(1, &this->EBO);
+
+	delete[] this->vertexArray;
+	delete[] this->indexArray;
 }
 
 void Mesh::Update()

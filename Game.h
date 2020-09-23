@@ -69,7 +69,6 @@ private:
 	void InitShaders();
 	void InitTextures();
 	void InitMaterials();
-	void InitMeshes();
 	void InitModels();
 	void InitLights();
 	void InitUniforms();
@@ -214,7 +213,7 @@ void Game::InitMaterials()
 		0, 1));
 }
 
-void Game::InitMeshes()
+void Game::InitModels()
 {
 	this->meshes.push_back(new Mesh(
 		&Pyramid(),
@@ -230,11 +229,13 @@ void Game::InitMeshes()
 		glm::vec3(1.0f)
 	)
 	);
-}
+	
+	this->models.push_back(new Model(glm::vec3(0.0f), this->materials[0], textures[ENUM_TEXTURE0], textures[ENUM_TEXTURE0_SPECULAR], this->meshes));
 
-void Game::InitModels()
-{
-	this->models.push_back(new Model(glm::vec3(0.0f), materials[0], textures[ENUM_TEXTURE0], textures[ENUM_TEXTURE0_SPECULAR], meshes));
+	for (auto*& i : meshes)
+		delete i;
+
+	this->meshes.clear();
 }
 
 void Game::InitLights()
@@ -316,12 +317,10 @@ Game::Game(
 	this->InitShaders();
 	this->InitTextures();
 	this->InitMaterials();
-	this->InitMeshes();
 	this->InitModels();
 	this->InitLights();
 	this->InitUniforms();
 }
-
 
 int Game::GetWindowShouldClose()
 {
@@ -339,8 +338,8 @@ void Game::Update()
 	UpdateInput();
 	UpdateDeltaTime();
 
-	////Update Roatation
-	//this->meshes[ENUM_MESH1]->Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
+	//Update Roatation
+	this->models[0]->Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Game::Render()
@@ -375,9 +374,6 @@ Game::~Game()
 
 	for (size_t i = 0; i < this->materials.size(); i++)
 		delete this->materials[i];
-
-	for (size_t i = 0; i < this->meshes.size(); i++)
-		delete this->meshes[i];
 	
 	for (auto&i : this->models)
 		delete i;

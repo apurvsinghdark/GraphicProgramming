@@ -21,6 +21,8 @@ public:
 	Model(glm::vec3 position, Material* material, Texture* textureDiffuse, Texture* textureSpecular, std::vector<Mesh*>meshes);
 	~Model();
 
+	void Rotate(const glm::vec3 rotation);
+
 	void Render(Shader* shader);
 };
 
@@ -47,6 +49,12 @@ Model::~Model()
 	{
 		delete i;
 	}
+}
+
+void Model::Rotate(const glm::vec3 rotation)
+{
+	for (auto& i : this->meshes)
+		i->Rotate(rotation);
 }
 
 void Model::Render(Shader* shader)
