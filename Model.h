@@ -37,9 +37,15 @@ Model::Model(glm::vec3 position, Material* material, Texture* textureDiffuse, Te
 	this->overerideTextureDiffuse = textureDiffuse;
 	this->overerideTextureSpecular = textureSpecular;
 
-	for (auto*i : meshes)
+	for (auto*& i : meshes)
 	{
 		this->meshes.push_back(new Mesh(*i));
+	}
+	
+	for (auto& i : this->meshes)
+	{
+		i->Move(this->position);
+		i->SetOrigin(this->position);
 	}
 }
 

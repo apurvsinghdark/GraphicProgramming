@@ -4,7 +4,7 @@
 #include"Camera.h"
 
 //Enumetrator
-enum shader_enum { ENUM_SHADER0 = 0 };
+enum shader_enum { ENUM_SHADER_CORE_PROGRAM = 0 };
 enum texture_enum { ENUM_TEXTURE0 = 0, ENUM_TEXTURE0_SPECULAR, ENUM_TEXTURE1, ENUM_TEXTURE1_SPECULAR };
 enum material_enum { ENUM_MATERIAL0 = 0 };
 enum mesh_enum { ENUM_MESH0 = 0, ENUM_MESH1};
@@ -52,7 +52,6 @@ private:
 	std::vector<Shader*> shaders;
 	std::vector<Texture*> textures;
 	std::vector<Material*> materials;
-	std::vector<Mesh*> meshes;
 	std::vector<Model*> models;
 	std::vector<glm::vec3*> lights;
 
@@ -215,27 +214,42 @@ void Game::InitMaterials()
 
 void Game::InitModels()
 {
-	this->meshes.push_back(new Mesh(
+	std::vector<Mesh*> meshes;
+
+	meshes.push_back(new Mesh(
 		&Pyramid(),
+		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f),
 		glm::vec3(0.0f),
 		glm::vec3(1.0f)
 	)
 	);
-	this->meshes.push_back(new Mesh(
-		&Pyramid(),
-		glm::vec3(1.0f),
-		glm::vec3(0.0f),
-		glm::vec3(1.0f)
+	this->models.push_back(new Model(glm::vec3(0.0f),
+		this->materials[ENUM_MATERIAL0],
+		this->textures[ENUM_TEXTURE0],
+		this->textures[ENUM_TEXTURE0_SPECULAR],
+		meshes
+	)
+	);this->models.push_back(new Model(glm::vec3(1.0f, 1.0f, 1.0f),
+		this->materials[ENUM_MATERIAL0],
+		this->textures[ENUM_TEXTURE0],
+		this->textures[ENUM_TEXTURE0_SPECULAR],
+		meshes
+	)
+	);this->models.push_back(new Model(glm::vec3(2.0f),
+		this->materials[ENUM_MATERIAL0],
+		this->textures[ENUM_TEXTURE0],
+		this->textures[ENUM_TEXTURE0_SPECULAR],
+		meshes
 	)
 	);
 	
-	this->models.push_back(new Model(glm::vec3(0.0f), this->materials[0], textures[ENUM_TEXTURE0], textures[ENUM_TEXTURE0_SPECULAR], this->meshes));
+	//this->models.push_back(new Model(glm::vec3(0.0f), this->materials[0], this->textures[ENUM_TEXTURE0], this->textures[ENUM_TEXTURE0_SPECULAR], meshes));
 
 	for (auto*& i : meshes)
 		delete i;
 
-	this->meshes.clear();
+	meshes.clear();
 }
 
 void Game::InitLights()
@@ -245,10 +259,10 @@ void Game::InitLights()
 
 void Game::InitUniforms()
 {
-	this->shaders[ENUM_SHADER0]->SetMat4("ViewMatrix", this->ViewMatrix);
-	this->shaders[ENUM_SHADER0]->SetMat4("ProjectionMatrix", this->ProjectionMatrix);
+	this->shaders[ENUM_SHADER_CORE_PROGRAM]->SetMat4("ViewMatrix", this->ViewMatrix);
+	this->shaders[ENUM_SHADER_CORE_PROGRAM]->SetMat4("ProjectionMatrix", this->ProjectionMatrix);
 
-	this->shaders[ENUM_SHADER0]->SetVec3("lightPos0", *this->lights[0]);
+	this->shaders[ENUM_SHADER_CORE_PROGRAM]->SetVec3("lightPos0", *this->lights[0]);
 }
 
 void Game::UpdateUniforms()
@@ -258,8 +272,8 @@ void Game::UpdateUniforms()
 	this->ViewMatrix = this->camera.GetViewMatrix();
 	//this->ViewMatrix = glm::lookAt(this->camPos, this->camPos + this->camFront, this->worldUp);
 
-	this->shaders[ENUM_SHADER0]->SetMat4("ViewMatrix", this->ViewMatrix);
-	this->shaders[ENUM_SHADER0]->SetVec3("camPos", this->camPos);
+	this->shaders[ENUM_SHADER_CORE_PROGRAM]->SetMat4("ViewMatrix", this->ViewMatrix);
+	this->shaders[ENUM_SHADER_CORE_PROGRAM]->SetVec3("camPos", this->camPos);
 
 	//Projection(PerspectiveVision)
 	this->ProjectionMatrix = glm::perspective(
@@ -269,7 +283,7 @@ void Game::UpdateUniforms()
 		this->farPlane
 	);
 
-	this->shaders[ENUM_SHADER0]->SetMat4("ProjectionMatrix", this->ProjectionMatrix);
+	this->shaders[ENUM_SHADER_CORE_PROGRAM]->SetMat4("ProjectionMatrix", this->ProjectionMatrix);
 }
 
 //constructors / desturctors
@@ -340,6 +354,7 @@ void Game::Update()
 
 	//Update Roatation
 	this->models[0]->Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
+	this->models[1]->Rotate(glm::vec3(1.0f, 1.0f, 0.0f));
 }
 
 void Game::Render()
@@ -351,7 +366,8 @@ void Game::Render()
 	//Update Uniforms
 	this->UpdateUniforms();
 	
-	this->models[0]->Render(this->shaders[ENUM_SHADER0]);
+	for(auto&i : this->models)
+		i->Render(this->shaders[ENUM_SHADER_CORE_PROGRAM]);
 
 	//END OF DRAW
 	glfwSwapBuffers(this->window);
